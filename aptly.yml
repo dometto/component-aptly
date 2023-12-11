@@ -1,0 +1,9 @@
+---
+- name: Use aptly to serve apt packages
+  hosts: localhost
+  gather_facts: true
+  tasks:
+    - name: Install aptly role
+      community.general.ansible_galaxy_install:
+        type: role
+        requirements_file: ../envs/requirements_aptly.yml
