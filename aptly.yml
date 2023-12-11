@@ -2,8 +2,59 @@
 - name: Use aptly to serve apt packages
   hosts: localhost
   gather_facts: true
+  pre_tasks:
+    # Assert nginx running
+    - name: Define repositories
+      set_fact:
+        aptly_repositories: # TODO: from json?
+        aptly_user: "{{ aptly_user | default('aptly') }}"
+
+  roles:
+    - role: ext/hetzner.aptly
+      vars:
+        aptly__user: aptly_user
+        aptly__gpg_private_key: "{{ aptly_gpg_private_key }}"
+        aptly__gpg_public_key: "{{ aptly_gpg_public_key }}"
+        aptly__repositories: "{{ aptly_repositories }}"
+          
   tasks:
-    - name: Install aptly role
-      community.general.ansible_galaxy_install:
-        type: role
-        requirements_file: ../envs/requirements_aptly.yml
+    - name: Add packages to jammy repo
+      become: true
+      become_user: aptly_user
+      shell: |
+        aptly repo add "{{ item.name }}" "{{ item.pkgs }}" && aptly publish -batch update "{{ item.name }}"
+      changed_when: false # TODO
+      with_items: aptly_repositories
+
+    - name: Make aptly files readable for nginx
+      block:
+        - name: Chown
+          file:
+            path: /srv/aptly/
+            owner: aptly
+            group: www-data
+            recurse: false
+        - name: Chown
+          file:
+            path: /srv/aptly/.aptly
+            owner: aptly
+            group: www-data
+            recurse: false
+        - name: Chown
+          file:
+            path: /srv/aptly/.aptly/public
+            owner: aptly
+            mode: 0270
+            group: www-data
+            recurse: true
+
+    - name: Create nginx location block
+      copy:
+        src: files/nginx/aptly.conf
+        dest: /etc/nginx/app-location-conf.d/aptly.conf
+        mode: 0644
+
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
