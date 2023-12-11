@@ -1,7 +1,7 @@
 ---
 aptly__repo: squeeze
 
-aptly__become_method: ansible.builtin.su
+aptly__become_method: sudo
 aptly__user: aptly
 aptly__groups:
   - "www-data"

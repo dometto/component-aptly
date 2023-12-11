@@ -6,7 +6,7 @@
   when: aptly__repository.state | default('present') == 'present'
   block:
     - name: Ensure repository exists
-      ansible.builtin.shell: |
+      shell: |
         aptly repo create -distribution="{{ aptly__repository.distribution }}" -component="{{ item }}" \
         -architectures="{{ aptly__repository.architectures | join(',') }}" \
         {{ aptly__repository.name }}-{{ item }}
@@ -18,7 +18,7 @@
       failed_when: "'already exists' not in reg_aptly_repo_creation.stderr | default('') and reg_aptly_repo_creation.rc >= 1"
 
     - name: Publish repository
-      ansible.builtin.shell: |
+      shell: |
         aptly publish repo -batch -architectures="{{ aptly__repository.architectures | join(',') }}" \
         -component="{{ aptly__repository.components | join(',') }}" \
         {% if aptly__repository.origin is defined and aptly__repository.origin | length %}-origin="{{ aptly__repository.origin }}"{% endif %} \
@@ -36,16 +36,16 @@
   when: aptly__repository.state | default('present') == 'absent'
   block:
     - name: Get published repository
-      ansible.builtin.command: "aptly publish show {{ aptly__repository.distribution }} {{ aptly__repository.publish_prefix | default('') }}"
+      command: "aptly publish show {{ aptly__repository.distribution }} {{ aptly__repository.publish_prefix | default('') }}"
       register: reg_aptly_publish_show
       failed_when: false
 
     - name: Remove publish
-      ansible.builtin.command: "aptly publish drop {{ aptly__repository.distribution }} {{ aptly__repository.publish_prefix | default('') }}"
+      command: "aptly publish drop {{ aptly__repository.distribution }} {{ aptly__repository.publish_prefix | default('') }}"
       when: "'Distribution:' in reg_aptly_publish_show.stdout and reg_aptly_publish_show.rc == 0"
 
     - name: Remove repository
-      ansible.builtin.command: "aptly repo drop {{ aptly__repository.name }}-{{ item }}"
+      command: "aptly repo drop {{ aptly__repository.name }}-{{ item }}"
       loop: "{{ aptly__repository.components | flatten(levels=1) }}"
       register: reg_aptly_repo_delete
       failed_when: "('not found' not in reg_aptly_repo_delete.stderr | default ('') and reg_aptly_repo_delete.rc >= 1)"

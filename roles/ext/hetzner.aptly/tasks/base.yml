@@ -1,6 +1,6 @@
 ---
 - name: Ensure aptly user exists
-  ansible.builtin.user:
+  user:
     name: "{{ aptly__user }}"
     groups: "{{ aptly__groups }}"
     append: true
@@ -8,7 +8,7 @@
     home: "{{ aptly__user_home_directory }}"
 
 - name: Ensure that aptly config is latest
-  ansible.builtin.copy:
+  copy:
     dest: "/etc/aptly.conf"
     content: "{{ aptly__config | to_nice_json }}"
     owner: "{{ aptly__user }}"
@@ -16,7 +16,7 @@
     mode: "0664"
 
 - name: Ensure aptly static directory exists
-  ansible.builtin.file:
+  file:
     path: "{{ aptly__user_home_directory }}/static"
     mode: "0755"
     state: directory
@@ -25,7 +25,7 @@
 
 - name: Ensure GPG secret key is latest
   no_log: true
-  ansible.builtin.copy:
+  copy:
     dest: "{{ aptly__user_home_directory }}/.sec_key.gpg"
     mode: "0644"
     owner: "{{ aptly__user }}"
@@ -34,7 +34,7 @@
 
 - name: Ensure GPG public key is latest
   no_log: true
-  ansible.builtin.copy:
+  copy:
     dest: "{{ aptly__user_home_directory }}/static/public.key"
     mode: "0644"
     owner: "{{ aptly__user }}"
@@ -42,9 +42,10 @@
     content: "{{ aptly__gpg_public_key }}"
 
 - name: Ensure GPG keys are imported for aptly user
-  ansible.builtin.shell: |
-    gpg --pinentry-mode loopback --import {{ aptly__user_home_directory }}/static/public.key ;
-    gpg --pinentry-mode loopback --allow-secret-key-import --import {{ aptly__user_home_directory }}/.sec_key.gpg
+  no_log: true
+  shell: |
+    gpg --pinentry-mode loopback --no-tty --import {{ aptly__user_home_directory }}/static/public.key ;
+    gpg --pinentry-mode loopback --no-tty --allow-secret-key-import --import {{ aptly__user_home_directory }}/.sec_key.gpg
   become: true
   become_user: "{{ aptly__user }}"
   become_method: "{{ aptly__become_method }}"
@@ -53,8 +54,12 @@
   args:
     executable: /bin/bash
 
+# - name: Debug
+#   debug:
+#     var: reg_import_gpg_keyss
+
 - name: Ensure API service is latest
-  ansible.builtin.template:
+  template:
     src: aptly-api.service.j2
     dest: /etc/systemd/system/aptly-api.service
     mode: "0644"
@@ -64,38 +69,5 @@
     - Enable aptly-api
     - Restart aptly-api
 
-- name: Ensure mirror instance service is latest
-  ansible.builtin.template:
-    src: aptly-mirror@.service.j2
-    dest: /etc/systemd/system/aptly-mirror@.service
-    mode: "0644"
-  notify:
-    - Reload systemd
-
-- name: Ensure mirror instance timer is latest
-  ansible.builtin.template:
-    src: aptly-mirror@.timer.j2
-    dest: /etc/systemd/system/aptly-mirror@.timer
-    mode: "0644"
-  notify:
-    - Reload systemd
-
-- name: Ensure mirror update script is latest
-  ansible.builtin.copy:
-    src: aptly-mirror-update.py
-    dest: /usr/local/bin/aptly-mirror-update
-    mode: "0755"
-    owner: root
-    group: root
-
-- name: Ensure mirror env directory exists
-  ansible.builtin.file:
-    path: /etc/aptly/mirror
-    recurse: true
-    state: directory
-    owner: root
-    group: root
-    mode: "0755"
-
 - name: Flush handlers
-  ansible.builtin.meta: flush_handlers
+  meta: flush_handlers
