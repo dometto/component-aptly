@@ -1,0 +1,27 @@
+---
+platforms:
+  - name: workspace-src-ubuntu_jammy
+    image: ghcr.io/utrechtuniversity/src-test-workspace:ubuntu_jammy
+    command: /sbin/init
+    pre_build_image: true
+    published_ports:
+      - 80/tcp
+    registry:
+      url: $DOCKER_REGISTRY
+      credentials:
+        username: $DOCKER_USER
+        password: $DOCKER_PW
+provisioner:
+  name: ansible
+  env:
+    components:
+      - name: nginx
+        git: https://gitlab.com/dometto/plugin-nginx.git
+        path: plugin-nginx.yml
+        parameters:
+          nginx_enable_auth: false
+          nginx_enable_ssl: false
+          rsc_nginx_service_url: _
+      - name: aptly
+        path: aptly.yml
+        # parameters: # Override this in a scenario's molecule.yml to pass parameters to your playbook or role
