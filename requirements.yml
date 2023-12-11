@@ -1,9 +1,0 @@
----    
-- src: https://github.com/juju4/ansible-gpgkey_generate.git
-  scm: git
-  version: 123aef8003706724f760ce3f5b2419bbd40d3b38
-  name: juju4.gpgkey_generate
-- src: https://github.com/hetznercloud/ansible-role-aptly.git
-  scm: git
-  version: 65eeaa87dadb1a628bd81d1aa88e6f373bb588e9
-  name: hetzner.aptly
