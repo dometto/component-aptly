@@ -1,0 +1,6 @@
+---
+- name: Create test .deb location
+  ansible.builtin.file:
+    dest: /pkgs
+    mode: 0755
+    state: directory

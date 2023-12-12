@@ -1,0 +1,8 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: "print ansible_facts vars"
+      debug:
+        var: ansible_facts
