@@ -54,10 +54,6 @@
   args:
     executable: /bin/bash
 
-# - name: Debug
-#   debug:
-#     var: reg_import_gpg_keyss
-
 - name: Ensure API service is latest
   template:
     src: aptly-api.service.j2
