@@ -27,9 +27,9 @@ provisioner:
         path: aptly.yml
         parameters: # The GPG keys defined below are mocks for testing purposes.
           aptly_packages: |
-            [{"name":"jammy","component":"main","packages":"/pkgs","architectures":["amd64"]}]
+            [{\"name\":\"jammy\",\"component\":\"main\",\"packages\":\"/pkgs\",\"architectures\":[\"amd64\"]}]
           aptly_repositories: |
-            [{"name":"jammy","distribution":"jammy","label":"cloud_platform","state":"present","components":["main","experimental"],"architectures":["amd64","arm64"]}]
+            [{\"name\":\"jammy\",\"distribution\":\"jammy\",\"label\":\"cloud_platform\",\"state\":\"present\",\"components\":[\"main\",\"experimental\"],\"architectures\":[\"amd64\",\"arm64\"]}]
           aptly_gpg_private_key: |
             -----BEGIN PGP PRIVATE KEY BLOCK-----
 

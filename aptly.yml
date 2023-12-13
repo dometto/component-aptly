@@ -13,11 +13,10 @@
         msg: The nginx service must be installed and active for the aptly component to work.
       when: nginx_status.status.ActiveState != 'active'
 
-    - name: Define aptly variables
+    - name: Set aptly variables
       set_fact:
         aptly_user: "{{ aptly_user | default('aptly') }}"
-        aptly_packages: "{{ aptly_packages | from_json }}"
-        aptly_repositories: "{{ aptly_repositories | from_json }}"
+        aptly__packages: "{{ aptly_packages | regex_replace('\\\\\"', '\"') | from_json }}"
 
   roles:
     - role: ext/hetzner.aptly
@@ -25,7 +24,7 @@
         aptly__user: "{{ aptly_user }}"
         aptly__gpg_private_key: "{{ aptly_gpg_private_key }}"
         aptly__gpg_public_key: "{{ aptly_gpg_public_key }}"
-        aptly__repositories: "{{ aptly_repositories }}"
+        aptly__repositories: "{{ aptly_repositories | regex_replace('\\\\\"', '\"') | from_json }}"
           
   tasks:
     - name: Make aptly files readable for nginx
@@ -55,7 +54,7 @@
       register: aptly_add
       changed_when: "'added' in aptly_add.stdout"
       tags: molecule-idempotence-notest
-      with_items: "{{ aptly_packages }}"
+      with_items: "{{ aptly__packages }}"
 
     - name: Create nginx location block
       copy:
