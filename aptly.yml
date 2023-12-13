@@ -12,6 +12,10 @@
       fail:
         msg: The nginx service must be installed and active for the aptly component to work.
       when: nginx_status.status.ActiveState != 'active'
+    
+    - name: Debug
+      debug:
+        var: aptly_packages
 
     - name: Set aptly variables
       set_fact:
