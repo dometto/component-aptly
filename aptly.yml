@@ -17,6 +17,10 @@
       debug:
         var: aptly_packages
 
+    - name: Debug
+      debug:
+        var: aptly_repositories
+
     - name: Set aptly variables
       set_fact:
         aptly_user: "{{ aptly_user | default('aptly') }}"
