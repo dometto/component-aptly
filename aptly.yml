@@ -17,6 +17,14 @@
       set_fact:
         aptly_user: "{{ aptly_user | default('aptly') }}"
 
+    - name: Debug aptly_packages
+      debug:
+        var: aptly_packages
+        
+    - name: Debug aptly_repositories
+      debug:
+        var: aptly_repositories
+
     - name: Set aptly packages
       set_fact:
         aptly__packages: "{{ aptly__packages|d([]) + [item|from_yaml] }}"
