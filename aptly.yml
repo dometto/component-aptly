@@ -20,7 +20,7 @@
     - name: Debug aptly_packages
       debug:
         var: aptly_packages
-        
+
     - name: Debug aptly_repositories
       debug:
         var: aptly_repositories
@@ -28,12 +28,12 @@
     - name: Set aptly packages
       set_fact:
         aptly__packages: "{{ aptly__packages|d([]) + [item|from_yaml] }}"
-      loop: "{{ aptly_packages.splitlines() | list }}"
+      loop: "{{ aptly_packages.split('\\n') | list }}"
 
     - name: Set aptly repositories
       set_fact:
         repos: "{{ repos|d([]) + [item|from_yaml] }}"
-      loop: "{{ aptly_repositories.splitlines() | list }}"
+      loop: "{{ aptly_repositories.split('\\n') | list }}"
 
   roles:
     - role: ext/hetzner.aptly
