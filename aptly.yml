@@ -12,19 +12,20 @@
       fail:
         msg: The nginx service must be installed and active for the aptly component to work.
       when: nginx_status.status.ActiveState != 'active'
-    
-    - name: Debug
-      debug:
-        var: aptly_packages
 
-    - name: Debug
-      debug:
-        var: aptly_repositories
-
-    - name: Set aptly variables
+    - name: Set aptly user
       set_fact:
         aptly_user: "{{ aptly_user | default('aptly') }}"
-        aptly__packages: "{{ aptly_packages | regex_replace('\\\\\"', '\"') | from_json }}"
+
+    - name: Set aptly packages
+      set_fact:
+        aptly__packages: "{{ aptly__packages|d([]) + [item|from_yaml] }}"
+      loop: "{{ aptly_packages.splitlines() | list }}"
+
+    - name: Set aptly repositories
+      set_fact:
+        repos: "{{ repos|d([]) + [item|from_yaml] }}"
+      loop: "{{ aptly_repositories.splitlines() | list }}"
 
   roles:
     - role: ext/hetzner.aptly
@@ -32,7 +33,7 @@
         aptly__user: "{{ aptly_user }}"
         aptly__gpg_private_key: "{{ aptly_gpg_private_key }}"
         aptly__gpg_public_key: "{{ aptly_gpg_public_key }}"
-        aptly__repositories: "{{ aptly_repositories | regex_replace('\\\\\"', '\"') | from_json }}"
+        aptly__repositories: "{{ repos }}"
           
   tasks:
     - name: Make aptly files readable for nginx
