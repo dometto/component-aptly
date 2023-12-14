@@ -43,8 +43,8 @@
     - role: ext/hetzner.aptly
       vars:
         aptly__user: "{{ aptly_user }}"
-        aptly__gpg_private_key: "{{ aptly_gpg_private_key | split('\\n') | join('\n') }}"
-        aptly__gpg_public_key: "{{ aptly_gpg_public_key | split('\\n') | join('\n') }}"
+        aptly__gpg_private_key: "{{ aptly_gpg_private_key.split('\\n') | join('\n') }}"
+        aptly__gpg_public_key: "{{ aptly_gpg_public_key.split('\\n') | join('\n') }}"
         aptly__repositories: "{{ repos }}"
           
   tasks:
