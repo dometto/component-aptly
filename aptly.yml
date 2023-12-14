@@ -13,6 +13,10 @@
         msg: The nginx service must be installed and active for the aptly component to work.
       when: nginx_status.status.ActiveState != 'active'
 
+    - name: Debug gpg key
+      debug:
+        var: aptly_gpg_public_key
+
     - name: Set aptly user
       set_fact:
         aptly_user: "{{ aptly_user | default('aptly') }}"
