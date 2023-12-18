@@ -63,16 +63,20 @@
             mode: 02750
             group: www-data
 
-    - name: Add packages to repositories
-      become: true
-      become_user: "{{ aptly_user }}"
-      shell: |
-        aptly repo add -architectures="{{ item.architectures | join(',') }}" {{ item.name }}-{{ item.component }} {{ item.packages }} \
-          && aptly publish -batch -architectures="{{ item.architectures | join(',') }}" update {{ item.name }}
+    - name: Create aptly_add_packages script
+      template:
+        src: aptly_add_packages.sh.j2
+        dest: /usr/local/bin/aptly_add_packages.sh
+        owner: aptly
+        group: root
+        mode: 0755
+
+    - name: Trigger aply_add script for the first time
+      command:
+        cmd: /usr/local/bin/aptly_add_packages.sh
       register: aptly_add
       changed_when: "'added' in aptly_add.stdout"
       tags: molecule-idempotence-notest
-      with_items: "{{ aptly__packages }}"
 
     - name: Create nginx location block
       copy:
