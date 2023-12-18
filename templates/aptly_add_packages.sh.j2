@@ -1,7 +1,7 @@
 #!/bin/bash
 
 {% for item in aptly__packages %}
-# Add packages from the repository {{ item.name}}-{{item.component}} ({{item.architectures}}), and then publish the repo.
+# Add packages from {{ item.packages }} the repository {{ item.name}}-{{item.component}} ({{item.architectures}}), and then publish the repo.
 su -c \
   "aptly repo add -architectures=\"{{ item.architectures | join(',') }}\" {{ item.name }}-{{ item.component }} {{ item.packages }} \
   && aptly publish -batch -architectures=\"{{ item.architectures | join(',') }}\" update {{ item.name }}" \
