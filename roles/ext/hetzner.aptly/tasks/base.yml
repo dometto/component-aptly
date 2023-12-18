@@ -24,7 +24,7 @@
     group: "{{ aptly__user }}"
 
 - name: Ensure GPG secret key is latest
-  #no_log: true
+  no_log: true
   copy:
     dest: "{{ aptly__user_home_directory }}/.sec_key.gpg"
     mode: "0644"
@@ -33,7 +33,7 @@
     content: "{{ aptly__gpg_private_key }}"
 
 - name: Ensure GPG public key is latest
-  #no_log: true
+  no_log: true
   copy:
     dest: "{{ aptly__user_home_directory }}/static/public.key"
     mode: "0644"
@@ -42,7 +42,7 @@
     content: "{{ aptly__gpg_public_key }}"
 
 - name: Ensure GPG keys are imported for aptly user
-  #no_log: true
+  no_log: true
   shell: |
     gpg --pinentry-mode loopback --no-tty --import {{ aptly__user_home_directory }}/static/public.key ;
     gpg --pinentry-mode loopback --no-tty --allow-secret-key-import --import {{ aptly__user_home_directory }}/.sec_key.gpg
