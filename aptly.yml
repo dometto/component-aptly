@@ -42,7 +42,8 @@
         aptly__gpg_private_key: "{{ aptly_gpg_private_key.split('\\n') | join('\n') }}"
         aptly__gpg_public_key: "{{ aptly_gpg_public_key.split('\\n') | join('\n') }}"
         aptly__repositories: "{{ repos }}"
-          
+        aptly__api_enable: "{{ aptly_api_enable | default('false') | bool }}"
+
   tasks:
     - name: Make aptly files readable for nginx
       block:
