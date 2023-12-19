@@ -1,4 +1,12 @@
 ---
+scenario:
+  test_sequence:
+    - destroy
+    - create
+    - prepare
+    - converge
+    # - idempotence # nginx plugin fails idempotence
+    - verify
 platforms:
   - name: workspace-src-ubuntu_jammy
     image: ghcr.io/utrechtuniversity/src-test-workspace:ubuntu_jammy
